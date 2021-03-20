@@ -5,8 +5,9 @@ from settings import *
 vec = pg.math.Vector2
 
 class Player(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
+        self.game = game
         self.image = pg.Surface((30, 40))
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
@@ -15,6 +16,13 @@ class Player(pg.sprite.Sprite):
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
 
+    def jump(self):
+        # jump only if standing on something
+        self.rect.y +=1
+        hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+        self.rect.y -= 1
+        if hits:
+            self.vel.y = -15
 
     def update(self):
         self.acc = vec(0, 0.5)
@@ -28,7 +36,7 @@ class Player(pg.sprite.Sprite):
         self.acc.x += self.vel.x * PLAYER_FRICTION
         # equations of motion
         self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
+        self.pos += self.vel + PLAYER_GRAVITY * self.acc
         # wrap around the sides of the show_go_screen
         if self.pos.x > WIDTH:
             self.pos.x = 0
