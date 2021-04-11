@@ -88,7 +88,7 @@ class Game:
 
     def draw(self):
         # game loop - draw / render
-        self.screen.fill(BLACK)
+        self.screen.fill(BGCOLOUR)
         self.all_sprites.draw(self.screen)
         self.draw_text(str(self.score), 22, WHITE, int(WIDTH / 2), 15)
         # *after* drawing everything, flip the display
@@ -96,11 +96,34 @@ class Game:
 
     def show_start_screen(self):
         # game splash/start show screen
-        pass
+        self.screen.fill(BGCOLOUR)
+        self.draw_text(TITLE, 48, WHITE, int (WIDTH / 2), int (HEIGHT / 4))
+        self.draw_text("Arrows to move, Space to jump", 22, WHITE, int (WIDTH / 2), int (HEIGHT / 2))
+        self.draw_text("Press a key to play", 22, WHITE, int (WIDTH /2), int (HEIGHT * 3 / 4))
+        pg.display.flip()
+        self.wait_for_key()
 
     def show_go_screen(self):
         # show game over screen
-        pass
+        if not self.running:
+            return
+        self.screen.fill(BGCOLOUR)
+        self.draw_text("GAME OVER", 48, WHITE, int (WIDTH / 2), int (HEIGHT / 4))
+        self.draw_text("Score: " + str(self.score), 22, WHITE, int (WIDTH / 2), int (HEIGHT / 2))
+        self.draw_text("Press a key to play again", 22, WHITE, int (WIDTH /2), int (HEIGHT * 3 / 4))
+        pg.display.flip()
+        self.wait_for_key()
+
+    def wait_for_key(self):
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    waiting = False
+                    self.running = False
+                if event.type == pg.KEYUP:
+                    waiting = False
 
     def draw_text(self, text, size, colour, x, y):
         font = pg.font.Font(self.font_name, size)
