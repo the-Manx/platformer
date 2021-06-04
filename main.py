@@ -29,6 +29,9 @@ class Game:
             self.highscore = 0
         # load sprites
         self.spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
+        # load sounds
+        self.snd_dir = path.join(self.dir, 'snd')
+        self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Jump.wav'))
 
     def new(self):
         # start a new game
@@ -60,8 +63,15 @@ class Game:
         if self.player.vel.y > 0:
             hits = pg.sprite.spritecollide(self.player, self.platforms, False)
             if hits:
-                self.player.pos.y = hits[0].rect.top
-                self.player.vel.y = 0
+                lowest = hits[0]
+                for hit in hits:
+                    if hit.rect.bottom > lowest.rect.bottom:
+                        lowest = hit
+                if self.player.pos.y < lowest.rect.centery:
+                    self.player.pos.y = lowest.rect.top
+                    self.player.vel.y = 0
+                    self.player.jumping = False
+
         # if player reaches top 1/4 of screen
         if self.player.rect.top <= HEIGHT / 4:
             self.player.pos.y += max (abs(int(self.player.vel.y)), 2)
@@ -99,6 +109,9 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
                     self.player.jump()
+            if event.type == pg.KEYUP:
+                if event.key == pg.K_SPACE:
+                    self.player.jump_cut()
 
     def draw(self):
         # game loop - draw / render
