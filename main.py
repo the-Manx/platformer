@@ -1,4 +1,6 @@
 # Jumpy! Platformer Main Run Script
+# music attribution: https://opengameart.org/content/retro-754
+
 import pygame as pg
 import random
 from settings import *
@@ -33,6 +35,7 @@ class Game:
         self.snd_dir = path.join(self.dir, 'snd')
         self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Jump.wav'))
 
+
     def new(self):
         # start a new game
         self.score = 0
@@ -44,10 +47,12 @@ class Game:
             p = Platform(self, *plat)
             self.all_sprites.add(p)
             self.platforms.add(p)
+        pg.mixer.music.load(path.join(self.snd_dir, 'retro754(minature).ogg'))
         self.run()
 
     def run(self):
         # game loop
+        pg.mixer.music.play(loops=-1)
         self.playing = True
         while self.playing:
             # keep loop running at the right speed
@@ -55,6 +60,7 @@ class Game:
             self.events()
             self.update()
             self.draw()
+        pg.mixer.music.fadeout(500)
 
     def update(self):
         # game  loop - update
@@ -124,6 +130,8 @@ class Game:
 
     def show_start_screen(self):
         # game splash/start show screen
+        pg.mixer.music.load(path.join(self.snd_dir, 'retro754(minaturev2).ogg'))
+        pg.mixer.music.play(loops=-1)
         self.screen.fill(BGCOLOUR)
         self.draw_text(TITLE, 48, WHITE, int (WIDTH / 2), int (HEIGHT / 4))
         self.draw_text("Arrows to move, Space to jump", 22, WHITE, int (WIDTH / 2), int (HEIGHT / 2))
@@ -131,11 +139,14 @@ class Game:
         self.draw_text("High Score: " + str(self.highscore), 22, WHITE, int (WIDTH / 2), 15)
         pg.display.flip()
         self.wait_for_key()
+        pg.mixer.music.fadeout(500)
 
     def show_go_screen(self):
         # show game over screen
         if not self.running:
             return
+        pg.mixer.music.load(path.join(self.snd_dir, 'retro754(minaturev2).ogg'))
+        pg.mixer.music.play(loops=-1)
         self.screen.fill(BGCOLOUR)
         self.draw_text("GAME OVER", 48, WHITE, int (WIDTH / 2), int (HEIGHT / 4))
         self.draw_text("Score: " + str(self.score), 22, WHITE, int (WIDTH / 2), int (HEIGHT / 2))
@@ -149,6 +160,7 @@ class Game:
             self.draw_text("High Score: " + str(self.highscore), 22, WHITE, int (WIDTH / 2), int (HEIGHT / 2) + 40)
         pg.display.flip()
         self.wait_for_key()
+        pg.mixer.music.fadeout(500)
 
     def wait_for_key(self):
         waiting = True
