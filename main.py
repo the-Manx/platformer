@@ -71,6 +71,10 @@ class Game:
         if now - self.mob_timer > 5000 + random.choice ([-1000, -500, 0, 500, 1000]):
             self.mob_timer = now
             Mob(self)
+        # hit mobs ?
+        mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False)
+        if mob_hits:
+            self.playing = False
 
         # check if player hits a platform - only if following
         if self.player.vel.y > 0:
