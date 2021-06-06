@@ -39,13 +39,14 @@ class Game:
     def new(self):
         # start a new game
         self.score = 0
-        self.all_sprites = pg.sprite.Group()
+        self.all_sprites = pg.sprite.LayeredUpdates()
         self.platforms = pg.sprite.Group()
         self.powerups = pg.sprite.Group()
+        self.mobs = pg.sprite.Group()
         self.player = Player(self)
-        self.all_sprites.add(self.player)
         for plat in PLATFORM_LIST:
             Platform(self, *plat)
+        self.mob_timer = 0
         pg.mixer.music.load(path.join(self.snd_dir, 'retro754(minature).ogg'))
         self.run()
 
@@ -64,6 +65,13 @@ class Game:
     def update(self):
         # game  loop - update
         self.all_sprites.update()
+
+        # spawn a mob
+        now = pg.time.get_ticks()
+        if now - self.mob_timer > 5000 + random.choice ([-1000, -500, 0, 500, 1000]):
+            self.mob_timer = now
+            Mob(self)
+
         # check if player hits a platform - only if following
         if self.player.vel.y > 0:
             hits = pg.sprite.spritecollide(self.player, self.platforms, False)
@@ -82,6 +90,8 @@ class Game:
         # if player reaches top 1/4 of screen
         if self.player.rect.top <= HEIGHT / 4:
             self.player.pos.y += max (abs(int(self.player.vel.y)), 2)
+            for mob in self.mobs:
+                mob.rect.y += max (abs(int(self.player.vel.y)), 2)
             for plat in self.platforms:
                 plat.rect.y += max (abs(int(self.player.vel.y)), 2)
                 if plat.rect.top >= HEIGHT:
@@ -131,7 +141,6 @@ class Game:
         # game loop - draw / render
         self.screen.fill(BGCOLOUR)
         self.all_sprites.draw(self.screen)
-        self.screen.blit(self.player.image, self.player.rect)
         self.draw_text(str(self.score), 22, WHITE, int(WIDTH / 2), 15)
         # *after* drawing everything, flip the display
         pg.display.flip()
